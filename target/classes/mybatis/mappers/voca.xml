@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.voca">
+	<resultMap id="memResult" type="vocaVO">
+		<result property="own_code" column="own_code" />
+		<result property="quiz_code" column="quiz_code" />
+		<result property="voca_code" column="voca_code" />
+	</resultMap>
+
+	<select id="selectMyListByID" resultMap="memResult"
+		parameterType="String">
+		<![CDATA[
+			select * from voca_table
+			where own_code=#{loginedUser}
+		]]>
+	</select>
+
+	<update id="deleteVoca" parameterType="VocaVO">
+		<![CDATA[
+			update voca_table set quiz_code=#{quiz_code}
+			where own_code=#{own_code}
+		]]>
+	</update>
+
+	<update id="addVoca" parameterType="VocaVO">
+		<![CDATA[
+			update voca_table set quiz_code=#{quiz_code}
+			where own_code=#{own_code}
+		]]>
+	</update>
+
+	<insert id="newUserVoca" parameterType="VocaVO">
+		<![CDATA[
+			insert into voca_table
+			values(#{own_code},#{quiz_code},#{voca_code})
+		]]>
+	</insert>
+</mapper>

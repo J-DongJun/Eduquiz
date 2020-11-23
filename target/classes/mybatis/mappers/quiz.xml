@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.quiz">
+	<resultMap id="quizResult" type="quizVO">
+		<result property="category" column="category" />
+        <result property="quiz_number" column="quiz_number" />
+        <result property="quiz" column="quiz" />
+        <result property="answer" column="answer" />
+        <result property="quiz_code" column="quiz_code" />
+	</resultMap>
+	
+
+
+	<select id="selectTwoRandomQuiz" resultMap="quizResult" parameterType="int">
+      <![CDATA[
+         select * from (
+         	select * from quiz_table
+         	where category=#{category}
+         	order by DBMS_random.random
+         )where rownum<3
+      ]]>
+	</select>
+	
+	<select id="selectAllQuizListByCategory" resultMap="quizResult" parameterType="int">
+		<![CDATA[
+         select * from (
+         	select * from quiz_table
+         	where category=#{category}
+         	order by DBMS_random.random
+         )where rownum<30
+      ]]>
+	</select>
+	
+	<select id="searchQuizByQuizCode" resultMap="quizResult" parameterType="String">
+	<![CDATA[
+         select * from quiz_table
+         where quiz_code=#{quizCode}
+      ]]>
+	</select>
+	
+	<select id="selectThreeRandomAnswer" resultType="string" parameterType="java.util.Map">
+      <![CDATA[
+         select * from (
+         	select answer from quiz_table
+         	where category=#{category} and quiz_code != #{quizCode}
+         	order by DBMS_random.random
+         )where rownum<4
+      ]]>
+	</select>
+	
+	<select id="select10moreQuiz" resultMap="quizResult" parameterType="int">
+		<![CDATA[
+         select * from quiz_table
+         order by quiz_code
+         offset #{startNo} rows fetch first 10 rows only
+      ]]>
+	</select>
+	<select id="getQuizNumberByCategory" parameterType="int" resultType="int">
+		<![CDATA[
+         select max(quiz_number)+1 from quiz_table
+         where category=#{category}
+      ]]>
+	</select>
+	
+	<delete id="deleteQuizByQuizCode" parameterType="String">
+	<![CDATA[
+         delete from quiz_table
+         where quiz_code=#{quizCode}
+      ]]>
+	</delete>
+	
+	<insert id="addNewQuiz" parameterType="quizVO">
+		<![CDATA[
+        	insert into quiz_table
+        	values(#{category},#{quiz_number},#{quiz},#{answer},#{quiz_code})
+      ]]>
+	</insert>
+	
+</mapper>

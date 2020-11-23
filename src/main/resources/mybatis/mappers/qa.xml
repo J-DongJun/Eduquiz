@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.qa">
+<resultMap id="qaesResult" type="qaVO">
+    <result property="level" column="level" />
+    <result property="qaNUM" column="qa_num" />
+    <result property="qaParentNUM" column="qa_parent_num" />
+    <result property="qaTitle" column="qa_title" />
+    <result property="qaHead" column="qa_head" />
+    <result property="qaDate" column="qa_date" />
+    <result property="id" column="id" />
+    <result property="qaContent" column="qa_content" />
+</resultMap> 
+
+
+<!-- 목록 출력 -->
+  <select id="selectAllQaesList" resultMap="qaesResult"   >
+    <![CDATA[
+   select * from (select ROWNUM as rNum, qa_table.* from(
+SELECT level, qa_num, qa_parent_num, qa_title, qa_content, qa_date, qa_head, id from qa_table START WITH qa_parent_num=0 CONNECT BY PRIOR qa_num = qa_parent_num ORDER SIBLINGS BY qa_num DESC)qa_table) where rNum between #{rowStart} and #{rowEnd}
+    ]]>
+  </select>
+  
+  <!-- 글 순서 번호  -->
+  <!-- 레벨, 글번호, 부모글번호, 제목, 내용, 작성일, 머릿말, 아이디를 qa_table에서 가져오는데 qa_parent가 0인것 부터 글번호랑 parent num이랑 같은것을 내림차순으로 -->
+  <!--  select qa_num, qa_title, qa_content, id, qa_date, qa_head from (
+select qa_num, qa_title, qa_content, id, qa_date, qa_head, row_number() over(order by qa_num desc) as rNum from qa_table 
+)mp where rNum between #{rowStart} and #{rowEnd} order by qa_num desc -->
+
+<!-- 글번호와 부모글번호가 같으면 글번호 순서대로 -->
+	 <!-- SELECT level, qa_num, qa_parent_num, qa_title, qa_content, qa_date, qa_head, id
+      from qa_table START WITH qa_parent_num=0 CONNECT BY PRIOR qa_num = qa_parent_num ORDER SIBLINGS BY qa_num DESC -->
+	
+<!-- 페이지 카운트 -->
+	<select id="listCount" resultType="int">
+	<![CDATA[
+		select count(qa_num) from qa_table where qa_num>0
+	]]>
+	</select>
+
+
+<!-- 글 추가 -->	 
+  <insert id="insertNewQa"  parameterType="java.util.Map">
+		<![CDATA[
+			INSERT into qa_table(qa_num, qa_title, qa_content, qa_head, id)
+			VALUES(#{qaNUM }, #{qaTitle }, #{qaContent } ,#{qaHead }, #{id})
+		]]>      
+	</insert>
+
+	
+	
+	
+	<!-- 답글 추가 -->
+	 <insert id="addReply"  parameterType="java.util.Map">
+		<![CDATA[
+			INSERT into qa_table(qa_num, qa_title, qa_content, qa_head, qa_parent_num, id)
+			VALUES(#{qaNUM }, #{qaTitle }, #{qaContent } ,'▶문의답글', #{qaParentNUM }, #{id})
+		]]>      
+	</insert>
+	
+	
+	
+
+	
+<!-- 새로운 글 번호 -->
+	
+  <select id="selectNewQaNUM" resultType="int"  >
+		<![CDATA[
+			SELECT NVL(max(qa_num)+1,1) from qa_table		
+		]]>
+	</select>
+	
+
+<!-- 전체 글 번호 -->
+
+	<select id="totalCount" resultType="int"  >
+			<![CDATA[
+			select  count(*) from qa_table;		
+		]]>
+	</select>
+
+
+<!-- 상세창 -->
+
+  <select id="viewQa" parameterType="int" resultMap="qaesResult">
+    <![CDATA[
+      SELECT * from qa_table where qa_num=#{qaNUM}
+    ]]>
+  </select>
+
+<!-- 게시글 수정 -->  
+
+  <update id="updateQa"  parameterType="java.util.Map">
+			update qa_table set qa_title=#{qaTitle}, qa_content=#{qaContent} where qa_num=#{qaNUM}
+	</update>
+	
+	
+<!-- 게시글 삭제 -->	
+	
+	<delete id="deleteQa"  parameterType="int">
+    <![CDATA[
+      delete from qa_table
+      where qa_num in (
+         SELECT qa_num FROM  qa_table
+         START WITH qa_num = #{qaNUM}
+         CONNECT BY PRIOR  qa_num = qa_parent_num )
+    ]]>      
+  </delete>
+
+
+</mapper>

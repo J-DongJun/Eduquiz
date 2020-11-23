@@ -1,0 +1,62 @@
+
+ .theback {
+	backface-visibility: hidden;
+	transform: rotateX(180deg);
+	color: rgb(255, 255, 255);
+	font-size:40px;
+	font-weight: bold;
+}
+
+.theback button{
+	font-size:20px;
+	/*border-radius: 50px;*/
+	background-color:rgb(255,255,255);
+	border:black 1px solid;
+	border:outset;
+}
+
+.theback button:hover{
+	font-size:20px;
+	background-color:gray;
+	border:inset;
+}
+
+.thefront {
+	backface-visibility: hidden;
+}
+
+.thecard:hover{
+	transform: rotateX(180deg);
+	cursor: pointer;
+	background: silver;
+	/* -webkit-box-shadow: 0 0 50px 10px #29FF54;
+	box-shadow: 0 0 50px 10px #FF33E4; */
+	border:inset;
+}
+
+.thecard {
+	text-align: center;
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    height: 100%;
+    margin-right: 25%;
+    margin-left: 25%;
+    width: 50%;
+    background:white;
+    border : 12px white solid;
+    border:outset;
+    padding: 100px;
+   	border-radius: 20px;
+    font-size:20px;
+    /* -webkit-box-shadow: 0 0 50px 10px #29FF54;
+	box-shadow: 0 0 50px 10px #29FF54; */
+	margin-top:2%;
+	margin-bottom:2%;
+}
+
+.owl > .thecard{
+	text-align: center;
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    font-size:20px;
+}

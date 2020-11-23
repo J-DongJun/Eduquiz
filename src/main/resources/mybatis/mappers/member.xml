@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.member">
+
+	<resultMap type="memberVO" id="memResult">
+		<result property="id" column="id" />
+        <result property="pw" column="pw" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="isUseCookie" column="isUseCookie" />
+	</resultMap>
+	
+	<!-- 전체회원 정보조회 -->
+	<select id="selectAllMemberList" resultMap="memResult">
+	<![CDATA[
+		select *
+		from member_table
+	]]>
+	</select>
+	
+	<!-- 아이디를 통안 회원정보조회 -->
+	<select id="selectMemberById" resultMap="memResult" parameterType="String">
+	<![CDATA[
+		select *
+		from member_table
+		where id=#{id}
+	]]>
+	</select>
+	
+	<!-- 회원정보 추가 -->
+	<insert id="insertMember"  parameterType="memberVO">
+		<![CDATA[
+		 insert into member_table(id,pw, name, email)
+		 values(#{id}, #{pw}, #{name}, #{email})
+		]]>      
+	</insert>
+	
+	<!-- 비밀번호 수정 -->
+	<update id="updateMember"  parameterType="memberVO">
+     <![CDATA[
+	     update member_table
+	     set pw=#{pw}
+	     where id=#{id}
+      ]]>      
+   </update> 
+    
+   <!-- 회원정보 제거 --> 
+   <delete id="deleteMember"  parameterType="String">
+	<![CDATA[
+	   delete from  member_table
+	   where id=#{id}
+	]]>      
+  </delete>
+
+  
+  <!-- 로그인 -->
+  <select id="loginById"  resultType="memberVO"   parameterType="memberVO" >
+	<![CDATA[
+		select * from member_table	
+		where id=#{id} and pw=#{pw}		
+	]]>
+
+  </select>
+  
+  <!-- id 체크 -->
+  <select id="idCheck"  resultType="int"   parameterType="String" >
+	<![CDATA[
+		select count(id) from member_table	
+		where id=#{RgId}		
+	]]>
+  </select>  
+  
+  <!-- 로그인 된 경우 해당세션id와 유효시간을 table에 세팅 -->
+  <update id="keepLogin" parameterType="memberVO" >
+	<![CDATA[
+		update member_table 
+		set sessionkey=#{sessionId}, 
+		sessionLimit=#{sessionLimit} 
+		where id=#{id}
+	]]>
+  </update>
+  
+  <!--유효기간이 남아있으면서 해당 sessionId를 가지는 사용자 정보를 꺼내오는 부분  -->
+  <select id="checkUserWithSessionKey" resultType="memberVO">
+	<![CDATA[
+		select * from member_table	
+		where sessionkey=#{sessionId}
+		and sessionLimit > now()
+	]]>
+  </select>  
+
+</mapper>
